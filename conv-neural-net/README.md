@@ -19,7 +19,7 @@ python3 conv-neural-net/main.py
 python3 -m unittest discover -s conv-neural-net/tests -v
 ```
 
-The default program trains on MNIST and reports epoch losses and held-out digit classification accuracy. It reads the local dataset and downloads nothing. Tests check numerical gradients for one- and two-layer models, learning, input validation, and stable loss calculations.
+The default program trains on MNIST and reports epoch losses and held-out digit classification accuracy. It reads the dataset from disk and downloads nothing, so first follow the [MNIST download steps](#mnist). Tests check numerical gradients for one- and two-layer models, learning, input validation, and stable loss calculations.
 
 ## Use
 
@@ -48,9 +48,20 @@ See [the implementation and mathematics guide](docs/neuralnet.md) for a function
 
 ## MNIST
 
-The full original dataset is stored locally in `resources/mnist/` as four compressed IDX archives: 60,000 training images/labels and 10,000 test images/labels. Each image is 28×28 grayscale. Resource files are excluded from Git.
+The experiment uses the original MNIST dataset as four compressed IDX archives: 60,000 training images/labels and 10,000 test images/labels. Each image is 28×28 grayscale. The dataset is not included in the repository; `resources/` is excluded from Git.
 
-Run the MNIST experiment from the repository root:
+Download the archives into `conv-neural-net/resources/mnist/` from the repository root:
+
+```sh
+mkdir -p conv-neural-net/resources/mnist
+for file in train-images-idx3-ubyte train-labels-idx1-ubyte t10k-images-idx3-ubyte t10k-labels-idx1-ubyte; do
+  curl -fL -o "conv-neural-net/resources/mnist/$file.gz" "https://storage.googleapis.com/cvdf-datasets/mnist/$file.gz"
+done
+```
+
+Keep the files compressed. The loader checks each archive's MD5 checksum and reports any file that is missing or does not match. Without the files, the MNIST tests are skipped and `main.py` stops with a message naming the missing file.
+
+Then run the experiment from the repository root:
 
 ```sh
 python3 conv-neural-net/main.py
@@ -58,6 +69,6 @@ python3 conv-neural-net/main.py
 
 Edit `TRAIN_SIZE`, `TEST_SIZE`, `EPOCHS`, `NUM_LAYERS`, `FILTERS`, and `SEED` at the top of `main.py` to change the experiment. No command-line arguments or argument parser are used.
 
-The defaults sample 500 training images and 200 images from the separate official test split, using seed 42, then train a single convolution for three epochs. Images retain their original 28×28 dimensions, with pixels divided by 255. Test data is never used for updates. All four local archives are checksum-verified before loading.
+The defaults sample 500 training images and 200 images from the separate official test split, using seed 42, then train a single convolution for three epochs. Images retain their original 28×28 dimensions, with pixels divided by 255. Test data is never used for updates. All four archives are checksum-verified before loading.
 
-Pure Python convolution can take substantial time, especially with multiple layers. The default one-layer model only sees the central 3×3 patch, so its accuracy should not be compared with a conventional full-image MNIST CNN. The default run achieved **44.0% test accuracy**, up from 12.0% before training; the training-majority baseline scored 8.0%. Training loss fell from 2.1428 to 1.8427. This run took about 48 seconds on the local machine.
+Pure Python convolution can take substantial time, especially with multiple layers. The default one-layer model only sees the central 3×3 patch, so its accuracy should not be compared with a conventional full-image MNIST CNN. The default run achieved **44.0% test accuracy**, up from 12.0% before training; the training-majority baseline scored 8.0%. Training loss fell from 2.1428 to 1.8427. This run took about 48 seconds on the author's machine; runtime varies by hardware.

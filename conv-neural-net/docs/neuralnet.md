@@ -257,9 +257,9 @@ There is no pooling, full-image classification head, model persistence, automati
 
 ## 11. Loading and testing on MNIST
 
-`src/mnist.py` adds dataset handling without changing the model. MNIST has 60,000 training and 10,000 test examples, ten classes (digits 0–9), and 28×28 single-channel byte images.
+`src/mnist.py` adds dataset handling without changing the model. MNIST has 60,000 training and 10,000 test examples, ten classes (digits 0–9), and 28×28 single-channel byte images. The archives are not stored in Git; see [the README](../README.md#mnist) for download steps.
 
-`verify_files(directory)` checks the MD5 digest of each compressed archive against the expected MNIST digest. These checks detect incorrect or damaged local files.
+`verify_files(directory)` checks the MD5 digest of each compressed archive against the expected MNIST digest. These checks detect incomplete, incorrect, or damaged downloads.
 
 `load_mnist(split, limit, seed, directory)` decompresses the selected image and label archives using `gzip`. `struct.unpack` reads unsigned big-endian IDX headers: image magic number 2051 followed by count, height, and width; label magic number 2049 followed by count. The loader checks magic numbers, expected dimensions and split counts, payload lengths, and digit label ranges.
 
